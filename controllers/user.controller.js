@@ -11,6 +11,6 @@ exports.registerHandler = async (req, res) => {
     const { status, user } = await userService.registerUser(req.body);
     res.status(status).json(user);
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 };

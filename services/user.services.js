@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const bcrypt = require("bcrypt");
 
 exports.registerUser = async (userDetails) => {
   try {
@@ -21,8 +22,13 @@ exports.registerUser = async (userDetails) => {
         user: { message: "Email already exists" },
       };
     }
-
-    const newUserObj = new User(userDetails);
+    const hashedPassword = await bcrypt.hash(userDetails.password, 10);
+    const newUserObj = new User({
+      email: userDetails.email,
+      username: userDetails.username,
+      password: hashedPassword,
+      fullName: userDetails.fullName,
+    });
     const userRegistered = await newUserObj.save();
 
     return {
@@ -32,7 +38,7 @@ exports.registerUser = async (userDetails) => {
   } catch (error) {
     return {
       status: 500,
-      user: { message: error },
+      user: { message: error.message },
     };
   }
 };
