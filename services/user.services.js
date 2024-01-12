@@ -17,10 +17,7 @@ exports.siginUser = async (username, password) => {
       const match = await bcrypt.compare(password, existingUser.password);
 
       if (match) {
-        const token = jwt.sign(
-          { user_id: existingUser._id },
-          config.jwt.secret
-        );
+        const token = jwt.sign({ userId: existingUser._id }, config.jwt.secret);
 
         return {
           status: 200,
