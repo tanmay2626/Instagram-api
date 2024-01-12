@@ -19,6 +19,7 @@ const postSchema = new Schema({
   },
   caption: {
     type: String,
+    default: "",
     maxLength: 150,
   },
   comments: [
@@ -42,8 +43,18 @@ const postSchema = new Schema({
       replies: [this],
     },
   ],
+  tags: [
+    {
+      type: String,
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 const Post = model("post", postSchema);
 
 module.exports = Post;
+// tagged users

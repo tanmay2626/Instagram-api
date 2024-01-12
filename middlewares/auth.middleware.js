@@ -2,8 +2,6 @@ const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 
 exports.Authenticate = async (req, res, next) => {
-  console.log("1 - Log middleware");
-
   try {
     const tokenString = req.headers?.authorization;
     const token = tokenString.split(" ")[1];
