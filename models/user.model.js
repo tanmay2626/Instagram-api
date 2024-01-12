@@ -5,10 +5,12 @@ const userSchema = new Schema({
     type: String,
     lowercase: true,
     required: true,
+    unique: true,
   },
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   password: {
     type: String,
@@ -16,7 +18,7 @@ const userSchema = new Schema({
   },
   birthDate: {
     type: String,
-    required: true,
+    //required: true,
   },
   posts: {
     type: SchemaTypes.ObjectId,
@@ -26,12 +28,12 @@ const userSchema = new Schema({
     type: SchemaTypes.ObjectId,
     ref: "Follow",
   },
+  fullName: {
+    type: String,
+    default: "",
+    required: true,
+  },
   profile: {
-    fullName: {
-      type: String,
-      default: "",
-      required: true,
-    },
     bio: {
       type: String,
       default: "",
