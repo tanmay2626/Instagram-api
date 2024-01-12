@@ -1,5 +1,45 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("../config/config");
+
+exports.siginUser = async (username, password) => {
+  try {
+    const existingUser = await User.findOne({
+      username: username,
+    });
+    if (!existingUser) {
+      return {
+        status: 400,
+        token: { message: "User not found" },
+      };
+    } else {
+      const match = await bcrypt.compare(password, existingUser.password);
+
+      if (match) {
+        const token = jwt.sign(
+          { user_id: existingUser._id },
+          config.jwt.secret
+        );
+
+        return {
+          status: 200,
+          token: token,
+        };
+      } else {
+        return {
+          status: 400,
+          token: { message: "Incorrect password" },
+        };
+      }
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      token: { message: error.message },
+    };
+  }
+};
 
 exports.registerUser = async (userDetails) => {
   try {
