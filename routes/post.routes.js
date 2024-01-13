@@ -8,5 +8,7 @@ router.post(
   middleware.Authenticate,
   postController.createPostHandler
 );
+router.get("/post/posts", postController.getAllPostsHandler);
+router.get("/post/:postId", postController.getPostByIdHandler);
 
 module.exports = router;

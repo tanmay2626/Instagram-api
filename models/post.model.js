@@ -5,6 +5,7 @@ const postSchema = new Schema({
     type: SchemaTypes.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
   likes: [
     {
@@ -54,6 +55,7 @@ const postSchema = new Schema({
   },
 });
 
+//postSchema.index({ user: 1 });
 const Post = model("post", postSchema);
 
 module.exports = Post;
