@@ -46,8 +46,6 @@ exports.getAllPosts = async () => {
 };
 
 exports.getPostById = async (postId) => {
-  const x = new Types.ObjectId(postId);
-  console.log(x);
   try {
     const post = await Post.findOne({ _id: new Types.ObjectId(postId) });
     if (!post) {
@@ -65,6 +63,28 @@ exports.getPostById = async (postId) => {
     return {
       status: 500,
       post: { message: error.message },
+    };
+  }
+};
+
+exports.getUserPosts = async (userId) => {
+  try {
+    const posts = await Post.find({ user: new Types.ObjectId(userId) });
+    if (!posts) {
+      return {
+        status: 404,
+        posts: { message: "Post not found" },
+      };
+    } else {
+      return {
+        status: 200,
+        posts: posts,
+      };
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      posts: { message: error.message },
     };
   }
 };

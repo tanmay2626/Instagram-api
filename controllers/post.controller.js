@@ -29,3 +29,14 @@ exports.getPostByIdHandler = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getUserPostsHandler = async (req, res) => {
+  try {
+    const { status, posts } = await postServices.getUserPosts(
+      req.params.userId
+    );
+    res.status(status).json({ posts: posts });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
