@@ -56,7 +56,7 @@ const postSchema = new Schema({
 });
 
 //postSchema.index({ user: 1 });
-const Post = model("post", postSchema);
+const Post = model("Post", postSchema);
 
 module.exports = Post;
 // tagged users

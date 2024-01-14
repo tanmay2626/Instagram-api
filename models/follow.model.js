@@ -1,12 +1,14 @@
-const { Schema, model } = require("mongoose");
+const { SchemaTypes, Schema, model } = require("mongoose");
 
 const followSchema = new Schema({
-  follower_id: {
-    type: String,
+  followerId: {
+    type: SchemaTypes.ObjectId,
+    ref: "User",
     required: true,
   },
-  following_id: {
-    type: String,
+  followingId: {
+    type: SchemaTypes.ObjectId,
+    ref: "User",
     required: true,
   },
   createdAt: {
@@ -15,6 +17,10 @@ const followSchema = new Schema({
   },
 });
 
-const Follow = model("follow", followSchema);
+const Follow = model("Follow", followSchema);
+Follow.collection.createIndex(
+  { followerId: 1, followingId: 1 },
+  { unique: true }
+);
 
 module.exports = Follow;
