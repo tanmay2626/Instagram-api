@@ -88,3 +88,71 @@ exports.getUserPosts = async (userId) => {
     };
   }
 };
+
+exports.createComment = async (userId, postId, comment) => {
+  try {
+    const newComment = {
+      user: new Types.ObjectId(userId),
+      message: comment,
+    };
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: { comments: newComment },
+      },
+      { new: true }
+    ).populate({
+      path: "comments.user",
+      select: "username profile.profileImg",
+    });
+    if (!post) {
+      return {
+        status: 401,
+        post: { message: "Post not found" },
+      };
+    } else {
+      return {
+        status: 200,
+        post: post,
+      };
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      post: { message: error.message },
+    };
+  }
+};
+
+exports.createCommentReply = async (userId, postId, commentId, comment) => {
+  try {
+    const newReply = {
+      user: new Types.ObjectId(userId),
+      message: comment,
+    };
+    const post = await Post.findOneAndUpdate(
+      { _id: postId, "comments._id": commentId },
+      { $push: { "comments.$.replies": newReply } },
+      { new: true }
+    ).populate({
+      path: "comments.replies.user",
+      select: "username profile.profileImg",
+    });
+    if (!post) {
+      return {
+        status: 401,
+        post: { message: "Post not found" },
+      };
+    } else {
+      return {
+        status: 200,
+        post: post,
+      };
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      post: { message: error.message },
+    };
+  }
+};

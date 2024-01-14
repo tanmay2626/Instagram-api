@@ -40,3 +40,30 @@ exports.getUserPostsHandler = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.createCommentHandler = async (req, res) => {
+  try {
+    const { status, post } = await postServices.createComment(
+      req.userId,
+      req.params.postId,
+      req.body.comment
+    );
+    res.status(status).json({ post: post });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.createCommentReplyHandler = async (req, res) => {
+  try {
+    const { status, post } = await postServices.createCommentReply(
+      req.userId,
+      req.params.postId,
+      req.params.commentId,
+      req.body.comment
+    );
+    res.status(status).json({ post: post });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

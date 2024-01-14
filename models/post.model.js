@@ -34,6 +34,7 @@ const postSchema = new Schema({
         type: String,
         required: true,
         default: "",
+        maxLength: 100,
       },
       likes: [
         {

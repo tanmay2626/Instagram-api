@@ -11,5 +11,15 @@ router.post(
 router.get("/post/posts", postController.getAllPostsHandler);
 router.get("/post/:postId", postController.getPostByIdHandler);
 router.get("/post/user/:userId", postController.getUserPostsHandler);
+router.put(
+  "/post/:postId/comment/",
+  middleware.Authenticate,
+  postController.createCommentHandler
+);
+router.put(
+  "/post/:postId/comment/:commentId/reply",
+  middleware.Authenticate,
+  postController.createCommentReplyHandler
+);
 
 module.exports = router;
