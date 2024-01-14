@@ -20,14 +20,6 @@ const userSchema = new Schema({
     type: String,
     //required: true,
   },
-  posts: {
-    type: SchemaTypes.ObjectId,
-    ref: "Post",
-  },
-  follow: {
-    type: SchemaTypes.ObjectId,
-    ref: "Follow",
-  },
   fullName: {
     type: String,
     default: "",
@@ -41,18 +33,6 @@ const userSchema = new Schema({
     profileImg: {
       type: String,
       default: "default-profile.png",
-    },
-    followers_count: {
-      type: Number,
-      default: 0,
-    },
-    following_count: {
-      type: Number,
-      default: 0,
-    },
-    post_count: {
-      type: Number,
-      default: 0,
     },
   },
   createdAt: {
