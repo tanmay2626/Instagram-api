@@ -130,6 +130,7 @@ exports.createCommentReply = async (userId, postId, commentId, comment) => {
       user: new Types.ObjectId(userId),
       message: comment,
     };
+    // TODO: Refactor the reply thread
     const post = await Post.findOneAndUpdate(
       { _id: postId, "comments._id": commentId },
       { $push: { "comments.$.replies": newReply } },
@@ -142,6 +143,66 @@ exports.createCommentReply = async (userId, postId, commentId, comment) => {
       return {
         status: 401,
         post: { message: "Post not found" },
+      };
+    } else {
+      return {
+        status: 200,
+        post: post,
+      };
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      post: { message: error.message },
+    };
+  }
+};
+
+exports.addLike = async (userId, postId) => {
+  const likedUser = {
+    user: new Types.ObjectId(userId),
+  };
+  try {
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: { likes: likedUser },
+      },
+      { new: true }
+    ).populate({
+      path: "likes.user",
+      select: "username profile.profileImg",
+    });
+    if (!post) {
+      return {
+        status: 401,
+        post: { message: "Post not found" },
+      };
+    } else {
+      return {
+        status: 200,
+        post: post,
+      };
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      post: { message: error.message },
+    };
+  }
+};
+
+exports.unLike = async (userId, postId) => {
+  try {
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { likes: { user: userId } } },
+      { new: true }
+    );
+    if (!post) {
+      return {
+        status: 400,
+        post: { message: "Like not found" },
       };
     } else {
       return {

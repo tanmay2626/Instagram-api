@@ -9,8 +9,11 @@ const postSchema = new Schema({
   },
   likes: [
     {
-      type: SchemaTypes.ObjectId,
-      ref: "User",
+      user: {
+        type: SchemaTypes.ObjectId,
+        ref: "User",
+        unique: true,
+      },
     },
   ],
   content: {
@@ -38,8 +41,11 @@ const postSchema = new Schema({
       },
       likes: [
         {
-          type: SchemaTypes.ObjectId,
-          ref: "User",
+          user: {
+            type: SchemaTypes.ObjectId,
+            ref: "User",
+            unique: true,
+          },
         },
       ],
       replies: [this],

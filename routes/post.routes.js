@@ -22,4 +22,16 @@ router.put(
   postController.createCommentReplyHandler
 );
 
+router.put(
+  "/post/:postId/like/",
+  middleware.Authenticate,
+  postController.addLikeHandler
+);
+
+router.delete(
+  "/post/:postId/unlike/",
+  middleware.Authenticate,
+  postController.unLikeHandler
+);
+
 module.exports = router;

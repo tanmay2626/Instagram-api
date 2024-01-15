@@ -67,3 +67,27 @@ exports.createCommentReplyHandler = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.addLikeHandler = async (req, res) => {
+  try {
+    const { status, post } = await postServices.addLike(
+      req.userId,
+      req.params.postId
+    );
+    res.status(status).json({ post: post });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.unLikeHandler = async (req, res) => {
+  try {
+    const { status, post } = await postServices.unLike(
+      req.userId,
+      req.params.postId
+    );
+    res.status(status).json({ post: post });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
