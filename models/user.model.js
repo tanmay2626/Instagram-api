@@ -1,45 +1,19 @@
 const { Schema, model, SchemaTypes } = require("mongoose");
 
-const userSchema = new Schema({
-  username: {
-    type: String,
-    lowercase: true,
-    required: true,
-    unique: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  birthDate: {
-    type: String,
-    //required: true,
-  },
-  fullName: {
-    type: String,
-    default: "",
-    required: true,
-  },
-  profile: {
-    bio: {
+const userSchema = new Schema(
+  {
+    email: {
       type: String,
-      default: "",
+      required: true,
+      unique: true,
     },
-    profileImg: {
+    password: {
       type: String,
-      default: "default-profile.png",
+      required: true,
     },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-});
+  { timestamps: true }
+);
 
 const User = model("User", userSchema);
 
