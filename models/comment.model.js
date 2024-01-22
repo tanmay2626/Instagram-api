@@ -1,6 +1,6 @@
 const { Schema, model, SchemaTypes } = require("mongoose");
 
-const postSchema = new Schema(
+const commentSchema = new Schema(
   {
     user: {
       type: SchemaTypes.ObjectId,
@@ -9,11 +9,8 @@ const postSchema = new Schema(
     profile: {
       type: SchemaTypes.ObjectId,
       ref: "Profile",
+      required: true,
       index: true,
-    },
-    content: {
-      type: SchemaTypes.Array,
-      default: ["default-post.png"],
     },
     likes: [
       {
@@ -22,24 +19,16 @@ const postSchema = new Schema(
         unique: true,
       },
     ],
-    caption: {
+    comment: {
       type: String,
+      required: true,
       default: "",
-      trim: true,
-      maxLength: 150,
+      maxLength: 100,
     },
-    location: {
-      type: String,
-    },
-    comment: [
+    replies: [
       {
         type: SchemaTypes.ObjectId,
         ref: "Comment",
-      },
-    ],
-    hashtag: [
-      {
-        type: String,
       },
     ],
   },
@@ -47,7 +36,6 @@ const postSchema = new Schema(
 );
 
 //postSchema.index({ user: 1 });
-const Post = model("Post", postSchema);
+const Comment = model("Comment", commentSchema);
 
-module.exports = Post;
-// tagged users
+module.exports = Comment;
