@@ -9,6 +9,12 @@ router.post(
   followController.followUserHandler
 );
 
+router.post(
+  "/accept-request",
+  middleware.Authenticate,
+  followController.acceptRequestHandler
+);
+
 router.get(
   "/following",
   middleware.Authenticate,

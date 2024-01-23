@@ -11,6 +11,19 @@ exports.followUserHandler = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.acceptRequestHandler = async (req, res) => {
+  try {
+    const { status, message } = await followServices.acceptRequest(
+      req.userId,
+      req.body.userId,
+      req.body.accept
+    );
+    res.status(status).json({ message: message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 exports.getFollowingHandler = async (req, res) => {
   try {
     const { status, message } = await followServices.getFollowing(req.userId);

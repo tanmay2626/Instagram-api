@@ -1,14 +1,14 @@
 const { SchemaTypes, Schema, model } = require("mongoose");
 
 const followSchema = new Schema({
-  followerId: {
+  follower: {
     type: SchemaTypes.ObjectId,
-    ref: "User",
+    ref: "Profile",
     required: true,
   },
-  followingId: {
+  following: {
     type: SchemaTypes.ObjectId,
-    ref: "User",
+    ref: "Profile",
     required: true,
   },
   createdAt: {

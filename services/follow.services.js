@@ -51,6 +51,39 @@ exports.followUser = async (followerId, followingId) => {
   }
 };
 
+exports.acceptRequest = async (userId, followerId, accept) => {
+  try {
+    await Profile.findOneAndUpdate(
+      {
+        user: userId,
+      },
+      { $pull: { requests: followerId } },
+      { new: true }
+    );
+    if (accept == "true") {
+      const followingId = await Profile.findOne({ user: userId });
+      const newFollowerObj = new Follow({
+        follower: followerId,
+        following: followingId,
+      }).save();
+      return {
+        status: 200,
+        message: "Request accepted",
+      };
+    } else {
+      return {
+        status: 201,
+        message: "Request denied",
+      };
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
 exports.getFollowing = async (userId) => {
   try {
     const following = await Follow.find({
