@@ -1,9 +1,11 @@
 const userService = require("../services/user.services");
 
 exports.signInHandler = async (req, res) => {
-  const { email, password } = req.body;
   try {
-    const { status, token } = await userService.siginUser(email, password);
+    const { status, token } = await userService.siginUser(
+      req.body.email,
+      req.body.password
+    );
     res.status(status).json({ token: token });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -35,11 +37,9 @@ exports.editProfileHandler = async (req, res) => {
   }
 };
 
-exports.getUserProfileHandler = async (req, res) => {
+exports.getProfileHandler = async (req, res) => {
   try {
-    const { status, user } = await userService.getUserProfile(
-      req.params.username
-    );
+    const { status, user } = await userService.getProfile(req.params.username);
     res.status(status).json({ user: user });
   } catch (error) {
     res.status(500).json({ message: error.message });

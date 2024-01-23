@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 
-const updateUsername = async (username) => {
+const verifyUsername = async (username) => {
   const usernameExists = await Profile.findOne({
     username: username,
   });
@@ -20,6 +20,7 @@ const updateUsername = async (username) => {
 
 exports.siginUser = async (email, password) => {
   try {
+    // verify email
     const existingUser = await User.findOne({
       email: email,
     });
@@ -29,9 +30,11 @@ exports.siginUser = async (email, password) => {
         token: { message: "User not found" },
       };
     } else {
+      // verify password
       const match = await bcrypt.compare(password, existingUser.password);
 
       if (match) {
+        // generate token
         const token = jwt.sign(
           { userId: existingUser._id },
           config.jwt.secret,
@@ -59,8 +62,10 @@ exports.siginUser = async (email, password) => {
 
 exports.registerUser = async (userDetails) => {
   try {
-    const usernameExists = await updateUsername(userDetails.username);
+    // verify username
+    const usernameExists = await verifyUsername(userDetails.username);
 
+    // verify email
     const emailExists = await User.findOne({
       email: userDetails.email,
     });
@@ -70,6 +75,8 @@ exports.registerUser = async (userDetails) => {
         user: { message: "Email already exists" },
       };
     }
+
+    // hash password and creater new user
     const hashedPassword = await bcrypt.hash(userDetails.password, 10);
     const newUserObj = new User({
       email: userDetails.email,
@@ -77,6 +84,7 @@ exports.registerUser = async (userDetails) => {
     });
     const userCreated = await newUserObj.save();
 
+    // create new profile
     const newProfileObj = new Profile({
       user: userCreated._id,
       username: usernameExists,
@@ -96,8 +104,9 @@ exports.registerUser = async (userDetails) => {
   }
 };
 
-exports.getUserProfile = async (username) => {
+exports.getProfile = async (username) => {
   try {
+    // verify user
     const userExists = await Profile.findOne({ username: username });
     if (!userExists) {
       return {
@@ -121,12 +130,15 @@ exports.getUserProfile = async (username) => {
 exports.editProfile = async (userDetails, userId) => {
   const { username, fullName, bio, profileImg } = userDetails;
 
+  // provided feilds object
   const updateFields = {};
   if (username) updateFields.username = updateUsername(username);
   if (fullName) updateFields.fullName = fullName;
   if (bio) updateFields.bio = bio;
   if (profileImg) updateFields.profileImg = profileImg;
+
   try {
+    // verify user and update profile
     const userExists = await Profile.findOneAndUpdate(
       { user: userId },
       updateFields,
