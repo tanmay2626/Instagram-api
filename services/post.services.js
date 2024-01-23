@@ -1,5 +1,6 @@
 const { Types } = require("mongoose");
 const Post = require("../models/post.model");
+const Profile = require("../models/profile.model");
 
 exports.createPost = async (userId, postDetails) => {
   try {
@@ -9,11 +10,21 @@ exports.createPost = async (userId, postDetails) => {
         post: { message: "Failed to uplaod content" },
       };
     } else {
+      // TODO: Update - remove this and send profile from client
+      const profile = await Profile.findOne({ user: userId });
+
+      if (!profile) {
+        return {
+          status: 400,
+          post: { message: "Profile not found" },
+        };
+      }
       const newPost = new Post({
-        user: new Types.ObjectId(userId),
+        user: userId,
+        profile: profile._id,
         content: postDetails?.content,
         caption: postDetails?.caption,
-        tags: postDetails?.tags,
+        hashtag: postDetails?.tags,
       });
       const post = await newPost.save();
 

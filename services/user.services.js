@@ -1,4 +1,5 @@
 const Profile = require("../models/profile.model");
+const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
@@ -98,8 +99,8 @@ exports.registerUser = async (userDetails) => {
 
 exports.getUserProfile = async (username) => {
   try {
-    const user = await Profile.findOne({ username: username });
-    if (!user) {
+    const userExists = await Profile.findOne({ username: username });
+    if (!userExists) {
       return {
         status: 401,
         user: { message: "User not found" },
@@ -107,7 +108,7 @@ exports.getUserProfile = async (username) => {
     } else {
       return {
         status: 200,
-        user: user,
+        user: userExists,
       };
     }
   } catch (error) {

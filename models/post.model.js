@@ -50,4 +50,7 @@ const postSchema = new Schema(
 const Post = model("Post", postSchema);
 
 module.exports = Post;
+// TODO:
 // tagged users
+// make refs requierd
+// enable index for user
