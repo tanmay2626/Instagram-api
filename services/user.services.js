@@ -1,12 +1,10 @@
-const User = require("../models/user.model");
+const Profile = require("../models/profile.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
-const { Types } = require("mongoose");
-const Profile = require("../models/profile.model");
 
 const updateUsername = async (username) => {
-  const usernameExists = await User.findOne({
+  const usernameExists = await Profile.findOne({
     username: username,
   });
   if (usernameExists) {
@@ -78,7 +76,6 @@ exports.registerUser = async (userDetails) => {
       password: hashedPassword,
     });
     const userCreated = await newUserObj.save();
-    console.log(userCreated);
 
     const newProfileObj = new Profile({
       user: userCreated._id,
@@ -101,7 +98,7 @@ exports.registerUser = async (userDetails) => {
 
 exports.getUserProfile = async (username) => {
   try {
-    const user = await User.findOne({ username: username });
+    const user = await Profile.findOne({ username: username });
     if (!user) {
       return {
         status: 401,
@@ -122,21 +119,20 @@ exports.getUserProfile = async (username) => {
 };
 
 exports.editProfile = async (userDetails, userId) => {
-  const { username, fullName, password, bio, profileImg } = userDetails;
+  const { username, fullName, bio, profileImg } = userDetails;
 
   const updateFields = {};
   if (username) updateFields.username = updateUsername(username);
   if (fullName) updateFields.fullName = fullName;
-  if (password) updateFields.password = password;
-  if (bio) updateFields["profile.bio"] = bio;
-  if (profileImg) updateFields["profile.profileImg"] = profileImg;
+  if (bio) updateFields.bio = bio;
+  if (profileImg) updateFields.profileImg = profileImg;
   try {
-    const user = await User.findByIdAndUpdate(
-      new Types.ObjectId(userId),
+    const userExists = await Profile.findOneAndUpdate(
+      { user: userId },
       updateFields,
       { new: true }
     );
-    if (!user) {
+    if (!userExists) {
       return {
         status: 401,
         user: { message: "User not found" },
@@ -144,7 +140,7 @@ exports.editProfile = async (userDetails, userId) => {
     }
     return {
       status: 200,
-      user: user,
+      user: userExists,
     };
   } catch (error) {
     return {

@@ -21,17 +21,6 @@ exports.registerHandler = async (req, res) => {
   }
 };
 
-exports.registerHandler = async (req, res) => {
-  try {
-    const { status, user } = await userService.registerUser(req.body);
-    res
-      .status(status)
-      .json({ message: "User registered successfully", user: user });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 exports.editProfileHandler = async (req, res) => {
   try {
     const { status, user } = await userService.editProfile(
