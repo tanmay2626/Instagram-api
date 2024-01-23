@@ -2,36 +2,51 @@ const express = require("express");
 const router = express.Router();
 const middleware = require("../middlewares/auth.middleware");
 const postController = require("../controllers/post.controller");
+const { getProfileId } = require("../middlewares/profile.middleware");
 
+// posts
 router.post(
-  "/post/create-post",
+  "/post/create",
   middleware.Authenticate,
-  postController.createPostHandler
+  getProfileId,
+  postController.postHandler
 );
-router.get("/post/posts", postController.getAllPostsHandler);
-router.get("/post/:postId", postController.getPostByIdHandler);
-router.get("/post/profile/:profileId", postController.getUserPostsHandler);
+router.get(
+  "/post/posts",
+  middleware.Authenticate,
+  getProfileId,
+  postController.getPostsHandler
+);
+router.get(
+  "/post/:postId",
+  middleware.Authenticate,
+  postController.getPostByIdHandler
+);
+router.get(
+  "/post/profile/:profileId",
+  middleware.Authenticate,
+  getProfileId,
+  postController.getPostByUserHandler
+);
+
+// comment
 router.put(
   "/post/:postId/comment/",
   middleware.Authenticate,
-  postController.createCommentHandler
+  getProfileId,
+  postController.commentHandler
 );
 router.put(
   "/post/:postId/comment/:commentId/reply",
   middleware.Authenticate,
-  postController.createCommentReplyHandler
+  getProfileId,
+  postController.replyHandler
 );
 
-router.put(
-  "/post/:postId/like/",
-  middleware.Authenticate,
-  postController.addLikeHandler
-);
-
-router.delete(
-  "/post/:postId/unlike/",
-  middleware.Authenticate,
-  postController.unLikeHandler
-);
+// like
+router
+  .route("/post/:postId/like/")
+  .put(middleware.Authenticate, getProfileId, postController.likeHandler)
+  .delete(middleware.Authenticate, getProfileId, postController.dislikeHandler);
 
 module.exports = router;

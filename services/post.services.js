@@ -1,25 +1,17 @@
-const { Types } = require("mongoose");
 const Post = require("../models/post.model");
-const Profile = require("../models/profile.model");
+const Follow = require("../models/follow.model");
 const Comment = require("../models/comment.model");
 
-exports.createPost = async (userId, postDetails) => {
+exports.post = async (userId, profile, postDetails) => {
   try {
+    // chech invalid post
     if (postDetails.content == undefined) {
       return {
         status: 401,
         post: { message: "Failed to uplaod content" },
       };
     } else {
-      // TODO: Update - remove this and send profile from client
-      const profile = await Profile.findOne({ user: userId });
-
-      if (!profile) {
-        return {
-          status: 400,
-          post: { message: "Profile not found" },
-        };
-      }
+      // create new post
       const newPost = new Post({
         user: userId,
         profile: profile._id,
@@ -42,18 +34,26 @@ exports.createPost = async (userId, postDetails) => {
   }
 };
 
-exports.getAllPosts = async () => {
-  // TODO: posts of followers
+exports.getPosts = async (profile) => {
   try {
-    const posts = await Post.find().populate({
-      path: "profile",
-      match: {
-        accountType: "public",
-      },
-    });
+    // profiles user follows
+    const profiles = await Follow.find({ follower: profile._id });
+
+    // TODO: limit number of posts based on createdAt
+    // posts of those users
+    const post = await Post.find({ profile: { $in: profiles } }).populate(
+      "profile"
+    );
+
+    if (!post) {
+      return {
+        status: 400,
+        post: { message: "No posts found" },
+      };
+    }
     return {
       status: 200,
-      posts: posts,
+      posts: post,
     };
   } catch (error) {
     return {
@@ -65,6 +65,7 @@ exports.getAllPosts = async () => {
 
 exports.getPostById = async (postId) => {
   try {
+    // get post by postId
     const post = await Post.findOne({ _id: postId }).populate("comment");
     if (!post) {
       return {
@@ -85,24 +86,35 @@ exports.getPostById = async (postId) => {
   }
 };
 
-exports.getUserPosts = async (profileId) => {
-  // TODO: get user post also when he is a follower or user himself
+exports.getPostByUser = async (follower, following) => {
   try {
-    const posts = await Post.find({ profile: profileId }).populate({
-      path: "profile",
-      match: {
-        accountType: "public",
-      },
+    const connected = await Follow.findOne({
+      follower: follower._id,
+      following: following,
     });
-    if (!posts) {
-      return {
-        status: 404,
-        posts: { message: "Posts not found" },
-      };
+    // if account is public or I am the owner or we are connected
+    if (
+      follower.accountType == "public" ||
+      follower._id == following ||
+      connected
+    ) {
+      const posts = await Post.find({ profile: following }).populate("profile");
+      if (!posts) {
+        return {
+          status: 400,
+          post: { message: "Post Unavailable" },
+        };
+      } else {
+        return {
+          status: 200,
+          post: posts,
+        };
+      }
     } else {
+      // private account
       return {
-        status: 200,
-        posts: posts,
+        status: 201,
+        post: { messgae: "Private Account" },
       };
     }
   } catch (error) {
@@ -113,15 +125,17 @@ exports.getUserPosts = async (profileId) => {
   }
 };
 
-exports.createComment = async (userId, postId, comment) => {
+exports.comment = async (userId, profile, postId, comment) => {
   try {
-    const profile = await Profile.findOne({ user: userId });
+    // create comment
     const newCommentObj = new Comment({
       user: userId,
       profile: profile._id,
       comment: comment,
     });
     const newComment = await newCommentObj.save();
+
+    // add comment to post
     const post = await Post.findByIdAndUpdate(
       postId,
       {
@@ -148,9 +162,9 @@ exports.createComment = async (userId, postId, comment) => {
   }
 };
 
-exports.createCommentReply = async (userId, commentId, comment) => {
+exports.reply = async (userId, profile, commentId, comment) => {
   try {
-    const profile = await Profile.findOne({ user: userId });
+    // create comment
     const newReplyObj = new Comment({
       user: userId,
       profile: profile._id,
@@ -158,6 +172,7 @@ exports.createCommentReply = async (userId, commentId, comment) => {
     });
     const newReply = await newReplyObj.save();
 
+    // add comment to replies
     const reply = await Comment.findOneAndUpdate(
       { _id: commentId },
       { $push: { replies: newReply._id } },
@@ -183,9 +198,9 @@ exports.createCommentReply = async (userId, commentId, comment) => {
   }
 };
 
-exports.addLike = async (userId, postId) => {
-  const profile = await Profile.findOne({ user: userId });
+exports.like = async (userId, profile, postId) => {
   try {
+    // add like
     const post = await Post.findByIdAndUpdate(
       postId,
       {
@@ -212,9 +227,9 @@ exports.addLike = async (userId, postId) => {
   }
 };
 
-exports.unLike = async (userId, postId) => {
-  const profile = await Profile.findOne({ user: userId });
+exports.dislike = async (userId, profile, postId) => {
   try {
+    // remove like
     const post = await Post.findByIdAndUpdate(
       postId,
       { $pull: { likes: profile._id } },

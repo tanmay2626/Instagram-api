@@ -1,9 +1,10 @@
 const postServices = require("../services/post.services");
 
-exports.createPostHandler = async (req, res) => {
+exports.postHandler = async (req, res) => {
   try {
-    const { status, post } = await postServices.createPost(
+    const { status, post } = await postServices.post(
       req.userId,
+      req.profile,
       req.body
     );
     res.status(status).json({ post: post });
@@ -12,9 +13,9 @@ exports.createPostHandler = async (req, res) => {
   }
 };
 
-exports.getAllPostsHandler = async (req, res) => {
+exports.getPostsHandler = async (req, res) => {
   try {
-    const { status, posts } = await postServices.getAllPosts();
+    const { status, posts } = await postServices.getPosts(req.profile);
     res.status(status).json({ posts: posts });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -30,9 +31,10 @@ exports.getPostByIdHandler = async (req, res) => {
   }
 };
 
-exports.getUserPostsHandler = async (req, res) => {
+exports.getPostByUserHandler = async (req, res) => {
   try {
-    const { status, posts } = await postServices.getUserPosts(
+    const { status, posts } = await postServices.getPostByUser(
+      req.profile,
       req.params.profileId
     );
     res.status(status).json({ posts: posts });
@@ -41,10 +43,11 @@ exports.getUserPostsHandler = async (req, res) => {
   }
 };
 
-exports.createCommentHandler = async (req, res) => {
+exports.commentHandler = async (req, res) => {
   try {
-    const { status, post } = await postServices.createComment(
+    const { status, post } = await postServices.comment(
       req.userId,
+      req.profile,
       req.params.postId,
       req.body.comment
     );
@@ -54,10 +57,11 @@ exports.createCommentHandler = async (req, res) => {
   }
 };
 
-exports.createCommentReplyHandler = async (req, res) => {
+exports.replyHandler = async (req, res) => {
   try {
-    const { status, post } = await postServices.createCommentReply(
+    const { status, post } = await postServices.reply(
       req.userId,
+      req.profile,
       req.params.commentId,
       req.body.comment
     );
@@ -67,10 +71,11 @@ exports.createCommentReplyHandler = async (req, res) => {
   }
 };
 
-exports.addLikeHandler = async (req, res) => {
+exports.likeHandler = async (req, res) => {
   try {
-    const { status, post } = await postServices.addLike(
+    const { status, post } = await postServices.like(
       req.userId,
+      req.profile,
       req.params.postId
     );
     res.status(status).json({ post: post });
@@ -79,10 +84,11 @@ exports.addLikeHandler = async (req, res) => {
   }
 };
 
-exports.unLikeHandler = async (req, res) => {
+exports.dislikeHandler = async (req, res) => {
   try {
-    const { status, post } = await postServices.unLike(
+    const { status, post } = await postServices.dislike(
       req.userId,
+      req.profile,
       req.params.postId
     );
     res.status(status).json({ post: post });
