@@ -73,7 +73,6 @@ exports.registerUser = async (userDetails) => {
     const hashedPassword = await bcrypt.hash(userDetails.password, 10);
     const newUserObj = new User({
       email: userDetails.email,
-      username: usernameExists,
       password: hashedPassword,
     });
     const userCreated = await newUserObj.save();

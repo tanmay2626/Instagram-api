@@ -38,7 +38,6 @@ const profileSchema = new Schema({
     {
       type: SchemaTypes.ObjectId,
       ref: "Profile",
-      select: false,
     },
   ],
 });

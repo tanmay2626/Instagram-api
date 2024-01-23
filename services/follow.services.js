@@ -1,35 +1,40 @@
 const { Types } = require("mongoose");
 const Follow = require("../models/follow.model");
-const User = require("../models/user.model");
+const Profile = require("../models/profile.model");
 
 exports.followUser = async (followerId, followingId) => {
   try {
-    const userExists = await User.findOne({ _id: followingId });
+    // followerId  - my userId
+    // followingId - other person's profileId
+    const followerProfile = await Profile.findOne({ user: followerId });
+    const existingRequest = await Profile.findOne({
+      _id: followingId,
+      requests: followerProfile,
+    });
 
-    if (!userExists) {
+    if (existingRequest) {
       return {
-        status: 404,
-        message: "User does not exist",
+        status: 400,
+        message: "You have already sent a follow request to this user.",
       };
     } else {
-      const Request = new Follow({
-        followerId: new Types.ObjectId(followerId),
-        followingId: new Types.ObjectId(followingId),
-      });
+      const request = await Profile.findOneAndUpdate(
+        { _id: followingId },
+        { $push: { requests: followerProfile } },
+        { new: true }
+      ).populate("requests");
 
-      const followReq = await Request.save();
-
-      if (!followReq) {
+      if (!request) {
         return {
           status: 400,
-          message: "Invalid follow request",
-        };
-      } else {
-        return {
-          status: 200,
-          message: "Successfully requested",
+          message: "Follow request failed",
         };
       }
+
+      return {
+        status: 200,
+        message: request,
+      };
     }
   } catch (error) {
     if (error.code === 11000) {
