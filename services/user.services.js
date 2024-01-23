@@ -18,10 +18,10 @@ const updateUsername = async (username) => {
   }
 };
 
-exports.siginUser = async (username, password) => {
+exports.siginUser = async (email, password) => {
   try {
     const existingUser = await User.findOne({
-      username: username,
+      email: email,
     });
     if (!existingUser) {
       return {

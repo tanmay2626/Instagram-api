@@ -1,9 +1,9 @@
 const userService = require("../services/user.services");
 
 exports.signInHandler = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const { status, token } = await userService.siginUser(username, password);
+    const { status, token } = await userService.siginUser(email, password);
     res.status(status).json({ token: token });
   } catch (error) {
     res.status(500).json({ message: error.message });
