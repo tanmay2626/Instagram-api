@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 const { Types } = require("mongoose");
+const Profile = require("../models/profile.model");
 
 const updateUsername = async (username) => {
   const usernameExists = await User.findOne({
@@ -75,9 +76,16 @@ exports.registerUser = async (userDetails) => {
       email: userDetails.email,
       username: usernameExists,
       password: hashedPassword,
+    });
+    const userCreated = await newUserObj.save();
+    console.log(userCreated);
+
+    const newProfileObj = new Profile({
+      user: userCreated._id,
+      username: usernameExists,
       fullName: userDetails.fullName,
     });
-    const userRegistered = await newUserObj.save();
+    const userRegistered = await newProfileObj.save();
 
     return {
       status: 200,

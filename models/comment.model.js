@@ -35,7 +35,6 @@ const commentSchema = new Schema(
   { timestamps: true }
 );
 
-//postSchema.index({ user: 1 });
 const Comment = model("Comment", commentSchema);
 
 module.exports = Comment;
