@@ -1,6 +1,7 @@
 const { Types } = require("mongoose");
 const Post = require("../models/post.model");
 const Profile = require("../models/profile.model");
+const Comment = require("../models/comment.model");
 
 exports.createPost = async (userId, postDetails) => {
   try {
@@ -64,7 +65,7 @@ exports.getAllPosts = async () => {
 
 exports.getPostById = async (postId) => {
   try {
-    const post = await Post.findOne({ _id: new Types.ObjectId(postId) });
+    const post = await Post.findOne({ _id: postId }).populate("comment");
     if (!post) {
       return {
         status: 404,
@@ -114,20 +115,20 @@ exports.getUserPosts = async (profileId) => {
 
 exports.createComment = async (userId, postId, comment) => {
   try {
-    const newComment = {
-      user: new Types.ObjectId(userId),
-      message: comment,
-    };
+    const profile = await Profile.findOne({ user: userId });
+    const newCommentObj = new Comment({
+      user: userId,
+      profile: profile._id,
+      comment: comment,
+    });
+    const newComment = await newCommentObj.save();
     const post = await Post.findByIdAndUpdate(
       postId,
       {
-        $push: { comments: newComment },
+        $push: { comment: newComment._id },
       },
       { new: true }
-    ).populate({
-      path: "comments.user",
-      select: "username profile.profileImg",
-    });
+    ).populate("comment");
     if (!post) {
       return {
         status: 401,
@@ -147,22 +148,23 @@ exports.createComment = async (userId, postId, comment) => {
   }
 };
 
-exports.createCommentReply = async (userId, postId, commentId, comment) => {
+exports.createCommentReply = async (userId, commentId, comment) => {
   try {
-    const newReply = {
-      user: new Types.ObjectId(userId),
-      message: comment,
-    };
-    // TODO: Refactor the reply thread
-    const post = await Post.findOneAndUpdate(
-      { _id: postId, "comments._id": commentId },
-      { $push: { "comments.$.replies": newReply } },
-      { new: true }
-    ).populate({
-      path: "comments.replies.user",
-      select: "username profile.profileImg",
+    const profile = await Profile.findOne({ user: userId });
+    const newReplyObj = new Comment({
+      user: userId,
+      profile: profile._id,
+      comment: comment,
     });
-    if (!post) {
+    const newReply = await newReplyObj.save();
+
+    const reply = await Comment.findOneAndUpdate(
+      { _id: commentId },
+      { $push: { replies: newReply._id } },
+      { new: true }
+    ).populate("replies");
+
+    if (!reply) {
       return {
         status: 401,
         post: { message: "Post not found" },
@@ -170,7 +172,7 @@ exports.createCommentReply = async (userId, postId, commentId, comment) => {
     } else {
       return {
         status: 200,
-        post: post,
+        post: reply,
       };
     }
   } catch (error) {

@@ -58,7 +58,6 @@ exports.createCommentReplyHandler = async (req, res) => {
   try {
     const { status, post } = await postServices.createCommentReply(
       req.userId,
-      req.params.postId,
       req.params.commentId,
       req.body.comment
     );
