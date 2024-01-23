@@ -184,20 +184,15 @@ exports.createCommentReply = async (userId, commentId, comment) => {
 };
 
 exports.addLike = async (userId, postId) => {
-  const likedUser = {
-    user: new Types.ObjectId(userId),
-  };
+  const profile = await Profile.findOne({ user: userId });
   try {
     const post = await Post.findByIdAndUpdate(
       postId,
       {
-        $push: { likes: likedUser },
+        $push: { likes: { _id: profile._id } },
       },
       { new: true }
-    ).populate({
-      path: "likes.user",
-      select: "username profile.profileImg",
-    });
+    ).populate("likes");
     if (!post) {
       return {
         status: 401,
@@ -218,10 +213,11 @@ exports.addLike = async (userId, postId) => {
 };
 
 exports.unLike = async (userId, postId) => {
+  const profile = await Profile.findOne({ user: userId });
   try {
     const post = await Post.findByIdAndUpdate(
       postId,
-      { $pull: { likes: { user: userId } } },
+      { $pull: { likes: profile._id } },
       { new: true }
     );
     if (!post) {
