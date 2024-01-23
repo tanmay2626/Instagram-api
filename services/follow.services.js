@@ -85,13 +85,11 @@ exports.acceptRequest = async (userId, followerId, accept) => {
 };
 
 exports.getFollowing = async (userId) => {
+  const profile = await Profile.findOne({ user: userId });
   try {
     const following = await Follow.find({
-      followerId: new Types.ObjectId(userId),
-    }).populate({
-      path: "followingId",
-      select: "username profile.profileImg fullName",
-    });
+      follower: profile._id,
+    }).populate("following");
     if (!following) {
       return {
         status: 400,
@@ -112,13 +110,11 @@ exports.getFollowing = async (userId) => {
 };
 
 exports.getFollowers = async (userId) => {
+  const profile = await Profile.findOne({ user: userId });
   try {
     const followers = await Follow.find({
-      followingId: new Types.ObjectId(userId),
-    }).populate({
-      path: "followerId",
-      select: "username profile.profileImg fullName",
-    });
+      following: profile._id,
+    }).populate("follower");
     if (!followers) {
       return {
         status: 400,
@@ -140,7 +136,9 @@ exports.getFollowers = async (userId) => {
 
 exports.unfollow = async (userId) => {
   try {
-    const unfollow = await Follow.findOneAndDelete({ followingId: userId });
+    const unfollow = await Follow.findOneAndDelete({
+      following: userId,
+    });
     if (!unfollow) {
       return {
         status: 400,
