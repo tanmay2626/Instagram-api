@@ -42,8 +42,14 @@ exports.createPost = async (userId, postDetails) => {
 };
 
 exports.getAllPosts = async () => {
+  // TODO: posts of followers
   try {
-    const posts = await Post.find();
+    const posts = await Post.find().populate({
+      path: "profile",
+      match: {
+        accountType: "public",
+      },
+    });
     return {
       status: 200,
       posts: posts,
@@ -78,13 +84,19 @@ exports.getPostById = async (postId) => {
   }
 };
 
-exports.getUserPosts = async (userId) => {
+exports.getUserPosts = async (profileId) => {
+  // TODO: get user post also when he is a follower or user himself
   try {
-    const posts = await Post.find({ user: new Types.ObjectId(userId) });
+    const posts = await Post.find({ profile: profileId }).populate({
+      path: "profile",
+      match: {
+        accountType: "public",
+      },
+    });
     if (!posts) {
       return {
         status: 404,
-        posts: { message: "Post not found" },
+        posts: { message: "Posts not found" },
       };
     } else {
       return {

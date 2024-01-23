@@ -33,7 +33,7 @@ exports.getPostByIdHandler = async (req, res) => {
 exports.getUserPostsHandler = async (req, res) => {
   try {
     const { status, posts } = await postServices.getUserPosts(
-      req.params.userId
+      req.params.profileId
     );
     res.status(status).json({ posts: posts });
   } catch (error) {

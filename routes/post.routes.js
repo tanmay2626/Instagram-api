@@ -10,7 +10,7 @@ router.post(
 );
 router.get("/post/posts", postController.getAllPostsHandler);
 router.get("/post/:postId", postController.getPostByIdHandler);
-router.get("/post/user/:userId", postController.getUserPostsHandler);
+router.get("/post/profile/:profileId", postController.getUserPostsHandler);
 router.put(
   "/post/:postId/comment/",
   middleware.Authenticate,
