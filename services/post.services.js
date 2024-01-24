@@ -37,11 +37,14 @@ exports.post = async (userId, profile, postDetails) => {
 exports.getPosts = async (profile) => {
   try {
     // profiles user follows
-    const profiles = await Follow.find({ follower: profile._id });
+    const profiles = await Follow.find({ follower: profile._id }).select(
+      "following"
+    );
+    const profileIds = profiles.map((follow) => follow.following);
 
     // TODO: limit number of posts based on createdAt
     // posts of those users
-    const post = await Post.find({ profile: { $in: profiles } }).populate(
+    const post = await Post.find({ profile: { $in: profileIds } }).populate(
       "profile"
     );
 
@@ -92,14 +95,15 @@ exports.getPostByUser = async (follower, following) => {
       follower: follower._id,
       following: following,
     });
+
     // if account is public or I am the owner or we are connected
     if (
       follower.accountType == "public" ||
       follower._id == following ||
       connected
     ) {
-      const posts = await Post.find({ profile: following }).populate("profile");
-      if (!posts) {
+      const post = await Post.find({ profile: following }).populate("profile");
+      if (!post) {
         return {
           status: 400,
           post: { message: "Post Unavailable" },
@@ -107,7 +111,7 @@ exports.getPostByUser = async (follower, following) => {
       } else {
         return {
           status: 200,
-          post: posts,
+          post: post,
         };
       }
     } else {
