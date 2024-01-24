@@ -111,6 +111,7 @@ exports.getFollowing = async (userId) => {
 
 exports.getFollowers = async (userId) => {
   const profile = await Profile.findOne({ user: userId });
+
   try {
     const followers = await Follow.find({
       following: profile._id,

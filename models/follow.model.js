@@ -18,9 +18,6 @@ const followSchema = new Schema({
 });
 
 const Follow = model("Follow", followSchema);
-Follow.collection.createIndex(
-  { followerId: 1, followingId: 1 },
-  { unique: true }
-);
+Follow.collection.createIndex({ follower: 1, following: 1 }, { unique: true });
 
 module.exports = Follow;
