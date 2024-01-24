@@ -17,7 +17,7 @@ exports.post = async (userId, profile, postDetails) => {
         profile: profile._id,
         content: postDetails?.content,
         caption: postDetails?.caption,
-        hashtag: postDetails?.tags,
+        hashtag: postDetails?.hashtag,
       });
       const post = await newPost.save();
 
