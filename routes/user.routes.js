@@ -16,12 +16,12 @@ router.get("/user/:username", userController.getProfileHandler);
 
 // Follow requests
 router.post(
-  "/follow-user",
+  "/user/follow",
   middleware.Authenticate,
   followController.followUserHandler
 );
 router.post(
-  "/accept-request",
+  "/user/accept",
   middleware.Authenticate,
   followController.acceptRequestHandler
 );
