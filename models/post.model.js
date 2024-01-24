@@ -5,6 +5,7 @@ const postSchema = new Schema(
     user: {
       type: SchemaTypes.ObjectId,
       ref: "User",
+      select: false,
     },
     profile: {
       type: SchemaTypes.ObjectId,
