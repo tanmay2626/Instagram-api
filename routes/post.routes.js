@@ -18,6 +18,12 @@ router.get(
   postController.getPostsHandler
 );
 router.get(
+  "/post/posts/refresh",
+  middleware.Authenticate,
+  getProfileId,
+  postController.refreshPostsHandler
+);
+router.get(
   "/post/:postId",
   middleware.Authenticate,
   postController.getPostByIdHandler
