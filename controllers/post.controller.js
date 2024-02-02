@@ -14,6 +14,19 @@ exports.postHandler = async (req, res) => {
   }
 };
 
+exports.refreshPostsHandler = async (req, res) => {
+  try {
+    redis.then(async (client) => {
+      await client.del(`feed:${req.profile._id}`);
+      const { status, posts } = await postServices.getPosts(req.profile);
+      await client.set(`feed:${req.profile._id}`, JSON.stringify(posts));
+      res.status(status).json({ posts });
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getPostsHandler = async (req, res) => {
   try {
     redis.then(async (client) => {
