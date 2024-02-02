@@ -1,4 +1,5 @@
 const postServices = require("../services/post.services");
+const redis = require("../config/redis").connectRedis();
 
 exports.postHandler = async (req, res) => {
   try {
@@ -15,8 +16,17 @@ exports.postHandler = async (req, res) => {
 
 exports.getPostsHandler = async (req, res) => {
   try {
-    const { status, posts } = await postServices.getPosts(req.profile);
-    res.status(status).json({ posts: posts });
+    redis.then(async (client) => {
+      const cachedPosts = await client.get(`feed:${req.profile._id}`);
+
+      if (cachedPosts) {
+        res.status(200).json({ posts: JSON.parse(cachedPosts) });
+      } else {
+        const { status, posts } = await postServices.getPosts(req.profile);
+        await client.set(`feed:${req.profile._id}`, JSON.stringify(posts));
+        res.status(status).json({ posts });
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
